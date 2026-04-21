@@ -1,2 +1,68 @@
 Name: Atimango Joan
-Date: 21st April,2026
+Date: 21st April,2026 
+
+import sqlite3
+conn = sqlite3.connect('nyondo_stock.db')
+conn.execute('''
+CREATE TABLE IF NOT EXISTS products (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+name TEXT NOT NULL,
+description TEXT,
+price REAL NOT NULL
+)
+''')
+conn.executemany(
+'INSERT INTO products (name, description, price) VALUES (?, ?, ?)',
+[
+('Cement (bag)', 'Portland cement 50kg bag', 35000),
+('Iron Sheet 3m','Gauge 30 roofing sheet 3m long', 110000),
+('Paint 5L', 'Exterior wall paint white 5L', 60000),
+
+('Nails 1kg', 'Common wire nails 1kg pack', 12000),
+('Timber 2x4', 'Pine timber plank 2x4 per metre', 25000),
+]
+)
+conn.commit()
+rows = conn.execute('SELECT * FROM products').fetchall()
+for r in rows: print(r)
+
+
+
+# queries.py
+import sqlite3
+conn = sqlite3.connect('nyondo_stock.db')
+
+# Query A - Get every column of every product
+print("A:", conn.execute("SELECT * FROM products").fetchall())
+
+# Query B - Get only the name and price of all products
+print("B:", conn.execute("SELECT name, price FROM products").fetchall())
+
+# Query C - Get full details of the product with id = 3
+print("C:", conn.execute("SELECT * FROM products WHERE id=3").fetchall())
+
+# Query D - Find all products whose name contains 'sheet'
+print("D:", conn.execute("SELECT * FROM products WHERE name LIKE '%sheet%'").fetchall())
+
+# Query E - Get all products sorted by price, highest first
+print("E:", conn.execute("SELECT * FROM products ORDER BY price DESC").fetchall())
+
+# Query F - Get only the 2 most expensive products
+print("F:", conn.execute("SELECT * FROM products ORDER BY price DESC LIMIT 2").fetchall())
+
+# Query G - Update the price of Cement (id=1) to 38,000 then SELECT * to confirm
+conn.execute("UPDATE products SET price=38000 WHERE id=1")
+conn.commit()
+print("G:", conn.execute("SELECT * FROM products").fetchall())
+
+$ python queries.py
+A: [(1, 'Cement (bag)', 'Portland cement 50kg bag', 35000.0), (2, 'Iron Sheet 3m', 'Gauge 30 roofing sheet 3m long', 110000.0), (3, 'Paint 5L', 'Exterior wall paint white 5L', 60000.0), (4, 'Nails 1kg', 'Common wire nails 1kg pack', 12000.0), (5, 'Timber 2x4', 'Pine timber plank 2x4 per metre', 25000.0)]
+B: [('Cement (bag)', 35000.0), ('Iron Sheet 3m', 110000.0), ('Paint 5L', 60000.0), ('Nails 1kg', 12000.0), ('Timber 2x4', 25000.0)]
+C: [(3, 'Paint 5L', 'Exterior wall paint white 5L', 60000.0)]
+D: [(2, 'Iron Sheet 3m', 'Gauge 30 roofing sheet 3m long', 110000.0)]
+E: [(2, 'Iron Sheet 3m', 'Gauge 30 roofing sheet 3m long', 110000.0), (3, 'Paint 5L', 'Exterior wall paint white 5L', 60000.0), (1, 'Cement (bag)', 'Portland cement 50kg bag', 35000.0), (5, 'Timber 2x4', 'Pine timber plank 2x4 per metre', 25000.0), (4, 'Nails 1kg', 'Common wire nails 1kg pack', 12000.0)]
+F: [(2, 'Iron Sheet 3m', 'Gauge 30 roofing sheet 3m long', 110000.0), (3, 'Paint 5L', 'Exterior wall paint white 5L', 60000.0)]
+G: [(1, 'Cement (bag)', 'Portland cement 50kg bag', 38000.0), (2, 'Iron Sheet 3m', 'Gauge 30 roofing sheet 3m long', 110000.0), (3, 'Paint 5L', 'Exterior wall paint white 5L', 60000.0), (4, 'Nails 1kg', 'Common wire nails 1kg pack', 12000.0), (5, 'Timber 2x4', 'Pine timber plank 2x4 per metre', 25000.0)]
+
+GROUNDBREAKER@DESKTOP-736F7EL MINGW64 ~/OneDrive/Desktop/Sql/nyondo-sql-lab (main)
+$ 
