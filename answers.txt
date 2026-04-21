@@ -104,3 +104,48 @@ login("' OR '1'='1", "' OR '1'='1")
 
 print("ATTACK 4 - UNION attack (steal users)")
 search_product("' UNION SELECT id, username, password, role FROM users--")
+
+
+
+
+
+import sqlite3
+
+conn = sqlite3.connect('nyondo_stock.db')
+
+
+# Secure product search
+def search_product_safe(name):
+    query = "SELECT * FROM products WHERE name LIKE ?"
+    param = f"%{name}%"
+    print(f"Query: {query} | Param: {param}")
+    rows = conn.execute(query, (param,)).fetchall()
+    return rows
+
+
+# Secure login
+def login_safe(username, password):
+    query = "SELECT * FROM users WHERE username=? AND password=?"
+    print(f"Query: {query} | Params: ({username}, {password})")
+    row = conn.execute(query, (username, password)).fetchone()
+    return row
+
+
+# ======================
+# TESTS (must fail attacks)
+# ======================
+
+print('Test 1:', search_product_safe("' OR 1=1--"))
+print('Test 2:', search_product_safe("' UNION SELECT id,username,password,role FROM users--"))
+print('Test 3:', login_safe("admin'--", 'anything'))
+print('Test 4:', login_safe("' OR '1'='1", "' OR '1'='1"))
+Test 1: []
+Test 2: []
+Test 3: None
+Test 4: None
+
+Parameterized queries prevent SQL injection by separating SQL code from user input. 
+Instead of inserting user input directly into the query string, placeholders (?) are used and the input is passed separately. 
+This ensures the database treats the input strictly as data, not as executable SQL code. 
+In contrast, f-strings combine user input with SQL commands, allowing attackers to inject malicious SQL. 
+Therefore, parameterized queries protect the system by blocking unintended query manipulation.
