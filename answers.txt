@@ -157,9 +157,8 @@ import sqlite3
 conn = sqlite3.connect('nyondo_stock.db')
 
 
-# ======================
+
 # VALIDATION FUNCTIONS
-# ======================
 
 def is_valid_name(name):
     if not isinstance(name, str):
@@ -187,9 +186,8 @@ def is_valid_password(password):
     return True
 
 
-# ======================
-# SECURE FUNCTIONS
-# ======================
+
+# SECURE FUNCTION
 
 def search_product_safe(name):
     if not is_valid_name(name):
@@ -216,9 +214,9 @@ def login_safe(username, password):
     return row
 
 
-# ======================
+#Task 5
 # TEST CASES
-# ======================
+
 
 print("Test 1:", search_product_safe('cement'))          # should work
 print("Test 2:", search_product_safe(''))                # rejected
